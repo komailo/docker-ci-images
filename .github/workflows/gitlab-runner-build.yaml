@@ -85,7 +85,7 @@ jobs:
             type=semver,pattern={{version}},prefix=v,suffix=${{ env.SUFFIX }}
             type=semver,pattern={{major}}.{{minor}},prefix=v,suffix=${{ env.SUFFIX }}
             # latest
-            type=raw,event=push,value=latest,enable=${{ github.ref == 'refs/heads/main') }},suffix=${{ env.SUFFIX }}
+            type=raw,event=push,value=latest,enable=${{ github.ref == 'refs/heads/main' }},suffix=${{ env.SUFFIX }}
           flavor: |
             # This is disabled here so we can use the raw form above
             latest=false
