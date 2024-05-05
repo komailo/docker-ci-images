@@ -17,10 +17,6 @@ on:
       - ".github/workflows/gitlab-runners-build.yaml"
       - "gitlab-runner/**"
 
-concurrency:
-  group: ci-docker-build-gitlab-runner-general-purpose-${{ github.ref }}
-  cancel-in-progress: true
-
 defaults:
   run:
     working-directory: ./${{ env.name }}/${{ env.type }}
