@@ -18,8 +18,12 @@ on:
       - "gitlab-runner/**"
 
 concurrency:
-  group: ci-docker-build-${{ env.name }}-${{ env.type }}-${{ github.ref }}
+  group: ci-docker-build-gitlab-runner-general-purpose-${{ github.ref }}
   cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: ./${{ env.name }}/${{ env.type }}
 
 # Everything below should be common under all branches
 jobs:
