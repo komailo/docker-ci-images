@@ -1,4 +1,8 @@
-name: GitLab Runners Build
+name: GitLab Runner General Purpose Container
+
+env:
+  name: gitlab-runner
+  type: general-purpose
 
 on:
   push:
@@ -14,13 +18,13 @@ on:
       - "gitlab-runner/**"
 
 concurrency:
-  group: ci-docker-build-${{ github.ref }}
+  group: ci-docker-build-${{ env.name }}-${{ env.type }}-${{ github.ref }}
   cancel-in-progress: true
 
 # Everything below should be common under all branches
 jobs:
   build:
-    name: Build Docker containers
+    name: Build
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -48,8 +52,8 @@ jobs:
       - name: Build image
         uses: docker/build-push-action@v5
         with:
-          context: gitlab-runner/general-purpose
+          context: "${{ env.name }}/${{ env.type }}"
           platforms: ${{ matrix.platform }}
           push: true
           tags: |
-            "localhost/komailo/ci-images:gitlab-runner-general-purpose-${{ steps.get_parameters.outputs.tag }}"
+            "localhost/komailo/ci-images:${{ env.name }}-${{ env.type }}-${{ steps.get_parameters.outputs.tag }}"
