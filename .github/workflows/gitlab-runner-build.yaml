@@ -43,6 +43,9 @@ jobs:
               - '.github/workflows/${{ env.name }}-build.yml'
               - '${{ env.name }}/**'
   build:
+    permissions:
+      contents: read
+      packages: write
     env:
       # Push if not a pull request and references the main branch
       docker_push: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')) }}
