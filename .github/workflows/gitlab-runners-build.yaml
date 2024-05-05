@@ -2,6 +2,7 @@ name: GitLab Runner General Purpose
 
 env:
   name: gitlab-runner
+  docker_registry: ghcr.io
 
 on:
   push:
@@ -41,7 +42,7 @@ jobs:
     steps:
       - name: Checkout Code
         id: checkout_code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Set up QEMU
@@ -50,6 +51,12 @@ jobs:
         uses: docker/setup-buildx-action@v3
         with:
           driver-opts: network=host
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.docker_registry }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build image
         uses: docker/build-push-action@v5
         with:
@@ -57,4 +64,4 @@ jobs:
           platforms: ${{ matrix.platform }}
           push: true
           tags: |
-            "localhost/komailo/ci-images:${{ env.name }}-${{ matrix.type }}-${{ steps.get_parameters.outputs.tag }}"
+            "${{ env.docker_registry }}/${{ github.repository }}:${{ env.name }}-${{ matrix.type }}-${{ github.ref }}"
