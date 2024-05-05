@@ -62,6 +62,6 @@ jobs:
         with:
           context: "${{ env.name }}/${{ matrix.type }}"
           platforms: ${{ matrix.platform }}
-          push: true
+          push: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') }}
           tags: |
-            "${{ env.docker_registry }}/${{ github.repository }}:${{ env.name }}-${{ matrix.type }}-${{ github.ref }}"
+            "${{ env.docker_registry }}/${{ github.repository }}:${{ env.name }}-${{ matrix.type }}-${{ github.ref_name }}"
