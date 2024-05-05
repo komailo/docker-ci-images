@@ -19,7 +19,7 @@ on:
 
 defaults:
   run:
-    working-directory: ./${{ env.name }}/${{ env.type }}
+    working-directory: ./gitlab-runner/general-purpose
 
 # Everything below should be common under all branches
 jobs:
