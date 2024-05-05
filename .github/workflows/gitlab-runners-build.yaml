@@ -1,8 +1,7 @@
-name: GitLab Runner General Purpose Container
+name: GitLab Runner General Purpose
 
 env:
   name: gitlab-runner
-  type: general-purpose
 
 on:
   push:
@@ -19,7 +18,7 @@ on:
 
 defaults:
   run:
-    working-directory: ./gitlab-runner/general-purpose
+    working-directory: ./gitlab-runner
 
 # Everything below should be common under all branches
 jobs:
@@ -31,6 +30,8 @@ jobs:
         platform:
           - linux/amd64
           - linux/arm64
+        type:
+          - general-purpose
       fail-fast: false
     services:
       local_docker_registry:
@@ -52,8 +53,8 @@ jobs:
       - name: Build image
         uses: docker/build-push-action@v5
         with:
-          context: "${{ env.name }}/${{ env.type }}"
+          context: "${{ env.name }}/${{ matrix.type }}"
           platforms: ${{ matrix.platform }}
           push: true
           tags: |
-            "localhost/komailo/ci-images:${{ env.name }}-${{ env.type }}-${{ steps.get_parameters.outputs.tag }}"
+            "localhost/komailo/ci-images:${{ env.name }}-${{ matrix.type }}-${{ steps.get_parameters.outputs.tag }}"
