@@ -76,8 +76,9 @@ jobs:
             org.opencontainers.image.source=${{ github.repository_url }}
           tags: |
             # semver
-            type=semver,pattern={{version}},prefix=v
+            type=semver,pattern={{major}},prefix=v
             type=semver,pattern={{major}}.{{minor}},prefix=v
+            type=semver,pattern={{major}}.{{minor}}.{{patch}},prefix=v
             # latest
             type=raw,event=push,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
           flavor: |
