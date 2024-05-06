@@ -34,8 +34,9 @@ jobs:
               - '${{ env.name }}/**'
   build:
     permissions:
-      contents: read
+      id-token: write
       packages: write
+      contents: read
       attestations: write
     env:
       # Push if not a pull request and references the main branch
@@ -92,6 +93,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "Build and ${{ env.PUSH == 'true' && 'and push' || '' }} ${{ env.DOCKER_REPO }} image"
+        id: build_push
         if: contains(fromJson('["push", "pull_request"]'), github.event_name)
         uses: docker/build-push-action@v5
         with:
@@ -106,6 +108,15 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=target,annotation-index.org.opencontainers.image.description=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.description'] }}
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        if: ${{ env.docker_push }}
+        id: attest
+        with:
+          subject-name: ghcr.io/${{ github.repository }}/${{ env.name }}/${{ matrix.type }}
+          subject-digest: ${{ steps.build_push.outputs.digest }}
+          push-to-registry: ${{ env.docker_push }}
 
   skip-build:
     needs: [changes]
