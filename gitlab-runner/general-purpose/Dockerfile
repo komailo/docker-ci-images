@@ -1,7 +1,6 @@
 ARG TF_VERSION=1.7.5
 ARG GITLAB_RUNNER_IMAGE_TYPE=gitlab-runner
 ARG GITLAB_RUNNER_IMAGE_TAG=alpine-v16.1.0
-ARG IMAGE_PLATFORM
 
 FROM alpine:latest as terraform
 
@@ -13,7 +12,6 @@ RUN apk add --update --virtual .deps --no-cache gnupg && \
     ARCH=$(uname -m) \
     && case "$ARCH" in \
     x86_64) PLATFORM="linux_amd64";; \
-    aarch64) PLATFORM="linux_arm64";; \
     *) echo "Unsupported architecture"; exit 1;; \
     esac && \
     wget https://releases.hashicorp.com/${HASHI_CORP_PRODUCT}/${TF_VERSION}/${HASHI_CORP_PRODUCT}_${TF_VERSION}_${PLATFORM}.zip && \
