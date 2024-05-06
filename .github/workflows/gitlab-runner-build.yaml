@@ -103,7 +103,7 @@ jobs:
         with:
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          context: ./${{ env.name }}/${{ matrix.type}}
+          context: ./${{ env.name }}/${{ matrix.type }}
           build-args: |
             IMAGE_COMMIT=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
             IMAGE_DATE=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
