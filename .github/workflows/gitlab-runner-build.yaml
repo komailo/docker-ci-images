@@ -66,10 +66,10 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         env:
-          SUFFIX: ${{ format('-{0}', matrix.type) }}
+          SUFFIX: ${{ format('-{0}-{1}', env.name, matrix.type) }}
         with:
           images: |
-            ${{ env.docker_registry }}/ci-images/${{ env.name }}
+            ${{ env.docker_registry }}/ci-images
           labels: |
             org.opencontainers.image.authors="@${{ github.repository_owner }} Github Org"
             org.opencontainers.image.licenses=BSD-3
