@@ -29,6 +29,8 @@ RUN apk add --update --virtual .deps --no-cache gnupg && \
 
 FROM gitlab/${GITLAB_RUNNER_IMAGE_TYPE}:${GITLAB_RUNNER_IMAGE_TAG}
 
+ARG ANSIBLE_VERSION
+
 RUN apk update --no-cache && apk upgrade --no-cache && rm -rf /var/cache/apk/*
 
 # Install Ansible
