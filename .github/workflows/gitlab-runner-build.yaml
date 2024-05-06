@@ -2,7 +2,6 @@ name: GitLab Runner General Purpose
 
 env:
   name: gitlab-runner
-  docker_registry: ghcr.io
   platforms: linux/amd64,linux/arm64
 
 on:
@@ -69,7 +68,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.docker_registry }}/${{ github.repository_owner }}/ci-images/${{ env.name }}/${{ matrix.type }}
+            ghcr.io/${{ replace(github.repository, 'docker-', '') }}/${{ env.name }}/${{ matrix.type }}
           labels: |
             org.opencontainers.image.authors="@${{ github.repository_owner }} Github Org"
             org.opencontainers.image.licenses=BSD-3
