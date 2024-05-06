@@ -12,7 +12,7 @@ RUN apk add --update --virtual .deps --no-cache gnupg && \
     ARCH=$(uname -m) \
     && case "$ARCH" in \
     x86_64) PLATFORM="linux_amd64";; \
-    *) echo "Unsupported architecture"; exit 1;; \
+    *) echo "Unsupported architecture: $ARCH"; exit 1;; \
     esac && \
     wget https://releases.hashicorp.com/${HASHI_CORP_PRODUCT}/${TF_VERSION}/${HASHI_CORP_PRODUCT}_${TF_VERSION}_${PLATFORM}.zip && \
     wget https://releases.hashicorp.com/${HASHI_CORP_PRODUCT}/${TF_VERSION}/${HASHI_CORP_PRODUCT}_${TF_VERSION}_SHA256SUMS && \
