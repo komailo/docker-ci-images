@@ -69,7 +69,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            ${{ env.docker_registry }}/ci-images/${{ env.name }}/${{ matrix.type }}
+            ${{ env.docker_registry }}/${{ github.repository_owner }}/ci-images/${{ env.name }}/${{ matrix.type }}
           labels: |
             org.opencontainers.image.authors="@${{ github.repository_owner }} Github Org"
             org.opencontainers.image.licenses=BSD-3
@@ -88,7 +88,7 @@ jobs:
       - name: Log in to the Container registry
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.docker_registry }}/ci-images/${{ env.name }}/${{ matrix.type }}
+          registry: ${{ env.docker_registry }}/${{ github.repository_owner}}/ci-images/${{ env.name }}/${{ matrix.type }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
