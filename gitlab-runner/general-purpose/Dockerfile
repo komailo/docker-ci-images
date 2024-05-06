@@ -1,5 +1,5 @@
 ARG TF_VERSION=1.7.5
-ARG ANSIBLE_VERSION=9.5.1-r0
+ARG ANSIBLE_VERSION=7.5.0-r0
 ARG GITLAB_RUNNER_IMAGE_TYPE=gitlab-runner
 ARG GITLAB_RUNNER_IMAGE_TAG=alpine-v16.1.0
 
@@ -34,6 +34,6 @@ ARG ANSIBLE_VERSION
 RUN apk update --no-cache && apk upgrade --no-cache && rm -rf /var/cache/apk/*
 
 # Install Ansible
-RUN apk add ansible=${ANSIBLE_VERSION}
+RUN apk add --no-cache ansible=${ANSIBLE_VERSION}
 
 COPY --from=terraform /usr/local/bin/terraform /usr/local/bin/terraform
