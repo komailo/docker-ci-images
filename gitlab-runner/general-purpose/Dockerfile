@@ -34,6 +34,6 @@ ARG ANSIBLE_VERSION
 RUN apk update --no-cache && apk upgrade --no-cache && rm -rf /var/cache/apk/*
 
 # Install Ansible
-RUN apk add ansible-${ANSIBLE_VERSION}
+RUN apk add ansible=${ANSIBLE_VERSION}
 
 COPY --from=terraform /usr/local/bin/terraform /usr/local/bin/terraform
