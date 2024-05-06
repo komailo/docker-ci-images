@@ -2,7 +2,7 @@ name: GitLab Runner General Purpose
 
 env:
   name: gitlab-runner
-  docker_registry: ghcr.io/${{ github.repository }}
+  docker_registry: ghcr.io
   platforms: linux/amd64,linux/arm64
 
 on:
@@ -12,11 +12,6 @@ on:
     tags:
       - "*"
   pull_request:
-    branches:
-      - main
-    paths:
-      - ".github/workflows/gitlab-runners-build.yaml"
-      - "gitlab-runner/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -40,7 +35,6 @@ jobs:
               - '${{ env.name }}/**'
   build:
     permissions:
-      contents: read
       packages: write
     env:
       # Push if not a pull request and references the main branch
@@ -75,7 +69,7 @@ jobs:
           SUFFIX: ${{ format('-{0}', matrix.type) }}
         with:
           images: |
-            ${{ env.DOCKER_REPO }}
+            ${{ env.docker_registry }}/ci-images/${{ env.name }}
           labels: |
             org.opencontainers.image.authors="@${{ github.repository_owner }} Github Org"
             org.opencontainers.image.licenses=BSD-3
