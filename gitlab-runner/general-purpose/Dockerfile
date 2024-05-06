@@ -10,7 +10,12 @@ ARG HASHI_CORP_PRODUCT=terraform
 
 RUN apk add --update --virtual .deps --no-cache gnupg && \
     cd /tmp && \
-    PLATFORM=$(echo ${IMAGE_PLATFORM} | tr '/' '_') \
+    ARCH=$(uname -m) \
+    && case "$ARCH" in \
+    x86_64) PLATFORM="linux_amd64";; \
+    aarch64) PLATFORM="linux_arm64";; \
+    *) echo "Unsupported architecture"; exit 1;; \
+    esac && \
     wget https://releases.hashicorp.com/${HASHI_CORP_PRODUCT}/${TF_VERSION}/${HASHI_CORP_PRODUCT}_${TF_VERSION}_${PLATFORM}.zip && \
     wget https://releases.hashicorp.com/${HASHI_CORP_PRODUCT}/${TF_VERSION}/${HASHI_CORP_PRODUCT}_${TF_VERSION}_SHA256SUMS && \
     wget https://releases.hashicorp.com/${HASHI_CORP_PRODUCT}/${TF_VERSION}/${HASHI_CORP_PRODUCT}_${TF_VERSION}_SHA256SUMS.sig && \
