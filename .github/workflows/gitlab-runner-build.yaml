@@ -65,20 +65,19 @@ jobs:
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
-        env:
-          SUFFIX: ${{ format('-{0}-{1}', env.name, matrix.type) }}
         with:
           images: |
-            ${{ env.docker_registry }}/ci-images
+            ${{ env.docker_registry }}/ci-images/${{ env.name }}/${{ matrix.type }}
           labels: |
             org.opencontainers.image.authors="@${{ github.repository_owner }} Github Org"
             org.opencontainers.image.licenses=BSD-3
+            org.opencontainers.image.source=${{ github.repository_url }}
           tags: |
             # semver
-            type=semver,pattern={{version}},prefix=v,suffix=${{ env.SUFFIX }}
-            type=semver,pattern={{major}}.{{minor}},prefix=v,suffix=${{ env.SUFFIX }}
+            type=semver,pattern={{version}},prefix=v
+            type=semver,pattern={{major}}.{{minor}},prefix=v
             # latest
-            type=raw,event=push,value=latest,enable=${{ github.ref == 'refs/heads/main' }},suffix=${{ env.SUFFIX }}
+            type=raw,event=push,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
           flavor: |
             # This is disabled here so we can use the raw form above
             latest=false
