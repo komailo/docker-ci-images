@@ -36,4 +36,7 @@ RUN apk update --no-cache && apk upgrade --no-cache && rm -rf /var/cache/apk/*
 # Install Ansible
 RUN apk add --no-cache ansible=${ANSIBLE_VERSION}
 
+# Install Ansible
+RUN apk add --no-cache jq
+
 COPY --from=terraform /usr/local/bin/terraform /usr/local/bin/terraform
