@@ -1,7 +1,9 @@
-ARG TF_VERSION=1.7.5
+ARG ANSIBLE_LINT_VERSION=6.17.2-r0
 ARG ANSIBLE_VERSION=7.5.0-r0
-ARG GITLAB_RUNNER_IMAGE_TYPE=gitlab-runner
 ARG GITLAB_RUNNER_IMAGE_TAG=alpine-v16.1.0
+ARG GITLAB_RUNNER_IMAGE_TYPE=gitlab-runner
+ARG JQ_VERSION=1.6-r4
+ARG TF_VERSION=1.7.5
 
 FROM alpine:latest as terraform
 
@@ -29,14 +31,16 @@ RUN apk add --update --virtual .deps --no-cache gnupg && \
 
 FROM gitlab/${GITLAB_RUNNER_IMAGE_TYPE}:${GITLAB_RUNNER_IMAGE_TAG}
 
+ARG ANSIBLE_LINT_VERSION
 ARG ANSIBLE_VERSION
+ARG JQ_VERSION
 
 RUN apk update --no-cache && apk upgrade --no-cache && rm -rf /var/cache/apk/*
 
 # Install Ansible
-RUN apk add --no-cache ansible=${ANSIBLE_VERSION}
-
-# Install Ansible
-RUN apk add --no-cache jq
+RUN apk add --no-cache \
+    ansible=${ANSIBLE_VERSION} \
+    ansible-lint=${ANSIBLE_LINT_VERSION} \
+    jq=${JQ_VERSION}
 
 COPY --from=terraform /usr/local/bin/terraform /usr/local/bin/terraform
