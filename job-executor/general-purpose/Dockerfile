@@ -5,6 +5,7 @@ ARG GITLAB_RUNNER_IMAGE_TAG=alpine-v16.1.0
 ARG GITLAB_RUNNER_IMAGE_TYPE=gitlab-runner
 ARG JQ_VERSION=1.7.1-r0
 ARG TF_VERSION=1.7.5
+ARG OPENSSH_VERSION=9.6_p1-r0
 
 FROM alpine:${ALPINE_VERSION} as terraform
 
@@ -35,13 +36,15 @@ FROM alpine:${ALPINE_VERSION}
 ARG ANSIBLE_LINT_VERSION
 ARG ANSIBLE_VERSION
 ARG JQ_VERSION
+ARG OPENSSH_VERSION
 
 RUN apk update --no-cache && apk upgrade --no-cache && rm -rf /var/cache/apk/*
 
 # Install Ansible
 RUN apk add --no-cache \
-    ansible=${ANSIBLE_VERSION} \
     ansible-lint=${ANSIBLE_LINT_VERSION} \
-    jq=${JQ_VERSION}
+    ansible=${ANSIBLE_VERSION} \
+    jq=${JQ_VERSION} \
+    openssh=${OPENSSH_VERSION}
 
 COPY --from=terraform /usr/local/bin/terraform /usr/local/bin/terraform
