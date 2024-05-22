@@ -1,6 +1,10 @@
 version: 2
 updates:
   - package-ecosystem: "docker"
+    directory: "/github-runner/general-purpose"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "docker"
     directory: "/gitlab-runner/general-purpose"
     schedule:
       interval: "daily"
