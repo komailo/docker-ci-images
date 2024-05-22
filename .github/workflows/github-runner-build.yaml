@@ -1,0 +1,131 @@
+name: GitHub Runner General Purpose
+
+env:
+  name: github-runner
+  platforms: linux/amd64,linux/arm64
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "*"
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+# Everything below should be common under all branches
+jobs:
+  changes:
+    outputs:
+      should-run-build: ${{ steps.changes.outputs.src == 'true' || startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main' }}
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            src:
+              - '.github/workflows/${{ env.name }}-build.yml'
+              - '${{ env.name }}/**'
+  build:
+    permissions:
+      id-token: write
+      packages: write
+      contents: read
+      attestations: write
+    env:
+      # Push if not a pull request and references the main branch
+      docker_push: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')) }}
+    needs: [changes]
+    if: needs.changes.outputs.should-run-build == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        type:
+          - general-purpose
+      fail-fast: false
+    steps:
+      - name: Checkout Code
+        id: checkout_code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
+
+      # release version is the name of the tag i.e. v0.10.0 with the type appended i.e. v0.10.0-general-purpose
+      # if the ref is main then the release version is latest with the type appended i.e. latest-general-purpose
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}/${{ env.name }}/${{ matrix.type }}
+          labels: |
+            org.opencontainers.image.authors="@${{ github.repository_owner }} Github Org"
+            org.opencontainers.image.licenses=BSD-3
+            org.opencontainers.image.source=${{ github.repository_url }}
+          tags: |
+            # semver
+            type=semver,pattern={{major}},prefix=v,event=tag
+            type=semver,pattern={{major}}.{{minor}},prefix=v,event=tag
+            type=semver,pattern={{major}}.{{minor}}.{{patch}},prefix=v,event=tag
+            # latest
+            type=raw,event=push,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+          flavor: |
+            # This is disabled here so we can use the raw form above
+            latest=false
+            # Suffix is not used here since there's no way to disable it above
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io/${{ github.repository }}/${{ env.name }}/${{ matrix.type }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "Build and ${{ env.PUSH == 'true' && 'and push' || '' }} ${{ env.DOCKER_REPO }} image"
+        id: build_push
+        if: contains(fromJson('["push", "pull_request"]'), github.event_name)
+        uses: docker/build-push-action@v5
+        with:
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          context: ./${{ env.name }}/${{ matrix.type }}
+          build-args: |
+            IMAGE_COMMIT=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
+            IMAGE_DATE=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
+          platforms: ${{ env.platforms }}
+          push: ${{ env.docker_push }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,name=target,annotation-index.org.opencontainers.image.description=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.description'] }}
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        if: ${{ env.docker_push }}
+        id: attest
+        with:
+          subject-name: ghcr.io/${{ github.repository }}/${{ env.name }}/${{ matrix.type }}
+          subject-digest: ${{ steps.build_push.outputs.digest }}
+          push-to-registry: ${{ env.docker_push }}
+
+  skip-build:
+    needs: [changes]
+    if: needs.changes.outputs.should-run-build == 'false'
+    strategy:
+      matrix:
+        type:
+          - general-purpose
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'echo "No build required"'
