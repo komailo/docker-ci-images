@@ -15,7 +15,6 @@ concurrency:
 # Everything below should be common under all branches
 jobs:
   image-build:
-    name: "image sgs"
     uses: ./.github/workflows/reusable-image-build.yaml
     with:
       image_group: job-executor
