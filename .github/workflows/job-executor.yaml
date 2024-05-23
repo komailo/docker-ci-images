@@ -1,4 +1,4 @@
-name: GitLab Runner
+name: Job Executor
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
   image-build:
     uses: ./.github/workflows/reusable-image-build.yaml
     with:
-      image_group: gitlab-runner
+      image_group: job-executor
       image_type: general-purpose
       platforms: linux/amd64,linux/arm64
     secrets:
