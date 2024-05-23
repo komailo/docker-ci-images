@@ -126,6 +126,6 @@ jobs:
         uses: actions/attest-build-provenance@v1
         id: attest
         with:
-          subject-name: ghcr.io/${{ github.repository }}/${{ inputs.image_group }}/${{ matrix.type }}
+          subject-name: ghcr.io/${{ github.repository }}/${{ inputs.image_group }}/${{ matrix.image_type }}
           subject-digest: ${{ steps.build_push.outputs.digest }}
           push-to-registry: ${{ env.docker_push }}
