@@ -115,7 +115,7 @@ jobs:
           build-args: |
             IMAGE_COMMIT=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.revision'] }}
             IMAGE_DATE=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
-          platforms: ${{ env.platforms }}
+          platforms: ${{ inputs.platforms }}
           push: ${{ env.docker_push }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
