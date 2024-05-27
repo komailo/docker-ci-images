@@ -7,6 +7,7 @@ ARG GITLAB_RUNNER_IMAGE_TYPE=gitlab-runner
 ARG JQ_VERSION=1.7.1-r0
 ARG OPENSSH_VERSION=9.7_p1-r3
 ARG TF_VERSION=1.7.5
+ARG TRIVY_VERSION=0.51.4
 
 FROM alpine:${ALPINE_VERSION} as terraform
 
@@ -32,6 +33,8 @@ RUN apk add --update --virtual .deps --no-cache gnupg && \
     rm -f /tmp/${HASHI_CORP_PRODUCT}_${TF_VERSION}_${PLATFORM}.zip ${HASHI_CORP_PRODUCT}_${TF_VERSION}_SHA256SUMS ${TF_VERSION}/${HASHI_CORP_PRODUCT}_${TF_VERSION}_SHA256SUMS.sig && \
     apk del .deps
 
+FROM ghcr.io/aquasecurity/trivy:${TRIVY_VERSION} as trivy
+
 FROM alpine:${ALPINE_VERSION}
 
 ARG ANSIBLE_LINT_VERSION
@@ -51,3 +54,4 @@ RUN apk add --no-cache \
     openssh=${OPENSSH_VERSION}
 
 COPY --from=terraform /usr/local/bin/terraform /usr/local/bin/terraform
+COPY --from=trivy /usr/local/bin/trivy /usr/local/bin/trivy
