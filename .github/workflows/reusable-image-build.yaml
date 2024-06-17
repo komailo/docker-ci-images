@@ -107,7 +107,7 @@ jobs:
       - name: "Build and if required push image"
         if: env.build_required
         id: build_push
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           cache-from: type=gha
           cache-to: type=gha,mode=max
